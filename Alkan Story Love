@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alkan Love Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 1s ease-in-out;
+      color: #fff;
+      background-color: #1a1a1a;
+    }
+    h1 {
+      text-align: center;
+      padding-top: 20px;
+      font-size: 2.5em;
+    }
+    .section {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(255, 192, 203, 0.1);
+      border-radius: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 20px rgba(255, 192, 203, 0.3);
+    }
+    .message-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .message-box textarea {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+    }
+    .message-box button {
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffb6c1;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .message-box button:hover {
+      background-color: #ff9aa2;
+    }
+    .messages, .memories, .venting-log, .daily-challenges {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .time {
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💖 Alkan – Rakan & Saba 💖</h1>
+
+  <div class="time" id="timeDisplay"></div>
+
+  <!-- 💌 رسائل الحب -->
+  <div class="section">
+    <h2>Love Messages</h2>
+    <div class="message-box">
+      <textarea id="msgRakan" placeholder="Message from Rakan"></textarea>
+      <button onclick="saveMessage('Rakan')">Send</button>
+    </div>
+    <div class="message-box">
+      <textarea id="msgSaba" placeholder="Message from Saba"></textarea>
+      <button onclick="saveMessage('Saba')">Send</button>
+    </div>
+    <div class="messages" id="messages"></div>
+  </div>
+
+  <!-- 🧠 ذكريات -->
+  <div class="section">
+    <h2>Memories</h2>
+    <div class="message-box">
+      <textarea id="memory" placeholder="Write a memory..."></textarea>
+      <button onclick="saveMemory()">Add</button>
+    </div>
+    <div class="memories" id="memories"></div>
+  </div>
+
+  <!-- 💭 فضفضة يومية -->
+  <div class="section">
+    <h2>Daily Venting</h2>
+    <div class="message-box">
+      <textarea id="vent" placeholder="Let it out..."></textarea>
+      <button onclick="saveVenting()">Save</button>
+    </div>
+    <div class="venting-log" id="ventingLog"></div>
+  </div>
+
+  <!-- 🎯 تحدي اليوم -->
+  <div class="section">
+    <h2>Today's Challenge</h2>
+    <button onclick="showChallenge()">💘 Reveal Challenge</button>
+    <div class="daily-challenges" id="challengeDisplay"></div>
+  </div>
+
+  <!-- 🎶 موسيقى رومانسية -->
+  <audio id="bgMusic" autoplay loop></audio>
+
+  <script>
+    // خلفيات تتغير كل ساعتين
+    const backgrounds = [
+      "https://i.imgur.com/zlVbmX3.jpg",
+      "https://i.imgur.com/Odc5D0x.jpg",
+      "https://i.imgur.com/jB0raRA.jpg",
+    ];
+    let bgIndex = 0;
+    function updateBackground() {
+      document.body.style.backgroundImage = `url(${backgrounds[bgIndex]})`;
+      bgIndex = (bgIndex + 1) % backgrounds.length;
+    }
+    setInterval(updateBackground, 2 * 60 * 60 * 1000);
+    updateBackground();
+
+    // تحديث الوقت بتوقيت الأردن ولوس أنجلوس
+    function updateTime() {
+      const now = new Date();
+      const jordan = now.toLocaleString("en-US", { timeZone: "Asia/Amman" });
+      const la = now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" });
+      document.getElementById("timeDisplay").innerText =
+        `🇯🇴 Jordan: ${jordan} | 🇺🇸 LA: ${la}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // حفظ واسترجاع الرسائل
+    function saveMessage(sender) {
+      const msg = document.getElementById(`msg${sender}`).value;
+      if (!msg) return;
+      const key = "loveMessages";
+      const data = JSON.parse(localStorage.getItem(key)) || [];
+      data.push({ sender, msg, time: new Date().toLocaleString() });
+      localStorage.setItem(key, JSON.stringify(data));
+      document.getElementById(`msg${sender}`).value = "";
+      displayMessages();
+    }
+    function displayMessages() {
+      const data = JSON.parse(localStorage.getItem("loveMessages")) || [];
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = data.map(d => `<p><strong>${d.sender}:</strong> ${d.msg} <br><small>${d.time}</small></p>`).join("");
+    }
+    displayMessages();
+
+    // حفظ الذكريات
+    function saveMemory() {
+      const mem = document.getElementById("memory").value;
+      if (!mem) return;
+      const key = "memories";
+      const data = JSON.parse(localStorage.getItem(key)) || [];
+      data.push({ mem, time: new Date().toLocaleString() });
+      localStorage.setItem(key, JSON.stringify(data));
+      document.getElementById("memory").value = "";
+      displayMemories();
+    }
+    function displayMemories() {
+      const data = JSON.parse(localStorage.getItem("memories")) || [];
+      document.getElementById("memories").innerHTML = data.map(d => `<p>${d.mem}<br><small>${d.time}</small></p>`).join("");
+    }
+    displayMemories();
+
+    // فضفضة يومية
+    function saveVenting() {
+      const vent = document.getElementById("vent").value;
+      if (!vent) return;
+      const key = "venting";
+      const data = JSON.parse(localStorage.getItem(key)) || [];
+      data.push({ vent, time: new Date().toLocaleString() });
+      localStorage.setItem(key, JSON.stringify(data));
+      document.getElementById("vent").value = "";
+      displayVenting();
+    }
+    function displayVenting() {
+      const data = JSON.parse(localStorage.getItem("venting")) || [];
+      document.getElementById("ventingLog").innerHTML = data.map(d => `<p>${d.vent}<br><small>${d.time}</small></p>`).join("");
+    }
+    displayVenting();
+
+    // تحديات + صوت نغمة رومانسية هادئة
+    const challenges = [
+      "قول لبعضكم 3 أشياء تحبوها في بعض",
+      "رسالة صوتية بدون سبب 💌",
+      "تخطيط لموعد جديد 🌹",
+      "كل واحد يرسم الثاني على ورقة ✏️",
+      "كل واحد يكتب قصيدة قصيرة عن الثاني",
+    ];
+    const challengeSound = new Audio("https://cdn.pixabay.com/audio/2023/03/05/audio_c21e3f8b29.mp3");
+    challengeSound.volume = 0.7;
+    function showChallenge() {
+      const random = challenges[Math.floor(Math.random() * challenges.length)];
+      document.getElementById("challengeDisplay").innerText = random;
+      challengeSound.play();
+    }
+
+    // موسيقى رومانسية تتغير كل 4 ساعات
+    const musicTracks = [
+      "https://cdn.pixabay.com/audio/2023/02/28/audio_b29e338abe.mp3",
+      "https://cdn.pixabay.com/audio/2022/11/15/audio_173b993df2.mp3",
+      "https://cdn.pixabay.com/audio/2023/03/03/audio_33e86034a7.mp3",
+    ];
+    let musicIndex = 0;
+    function updateMusic() {
+      const music = document.getElementById("bgMusic");
+      music.src = musicTracks[musicIndex];
+      musicIndex = (musicIndex + 1) % musicTracks.length;
+      music.play();
+    }
+    setInterval(updateMusic, 4 * 60 * 60 * 1000);
+    updateMusic();
+  </script>
+
+</body>
+</html>
